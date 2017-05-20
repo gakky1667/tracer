@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/gakky/workspace/git/shell_scripts/ftrace/tracer.cpp
+stdio.h
+-
+stdlib.h
+-
+string
+-
+fstream
+-
+iostream
+-
+time.h
+-
+tracer.h
+/home/gakky/workspace/git/shell_scripts/ftrace/tracer.h
+
+/home/gakky/workspace/git/shell_scripts/ftrace/tracer.h
+stdlib.h
+-
+string
+-
+

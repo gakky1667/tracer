@@ -88,14 +88,12 @@ void MainWindow::InitView2(){
 void MainWindow::StartStopTrace(bool click){
 //	setuid(0);
 	if (click){
-		std::cout << "start" << std::endl;
-		//SchedViz::Tracer tracer;
-		//tracer.setup();
-		//tracer.start_ftrace();
+		SchedViz::Tracer tracer;
+		tracer.setup();
+		tracer.start_ftrace();
 	}else{
-		std::cout << "stop" << std::endl; 
-		//SchedViz::Tracer tracer; 
-		//tracer.reset();
+		SchedViz::Tracer tracer; 
+		tracer.reset();
 	}
 	//setuid(getuid());
 }

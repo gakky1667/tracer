@@ -39,6 +39,7 @@ public:
 	void reset();
 	void start_ftrace();
 	
+	std::vector<trace_info_t> get_info();
 	std::vector<node_info_t> v_node_info_;
 	std::vector<trace_info_t> v_trace_info;
 private:
@@ -60,7 +61,7 @@ private:
 	std::vector<std::string> split(std::string str, std::string delim);		
 	std::string trim(const std::string& string); 
 	int ctoi(std::string s);
-};
+	};
 }
 
 #endif // TRACER_H

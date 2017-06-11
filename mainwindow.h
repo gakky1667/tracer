@@ -43,7 +43,9 @@ private:
 
     void InitView1();
     void InitView2();
+		void viz_process(std::vector<trace_info_t> info);
 
+		std::vector<QGraphicsRectItem*> process_info;
     QSplitter *getGBSplitter(QGraphicsView *lview1,Browser *tBrowser);
     QSplitter *getGGSplitter(QGraphicsView *lview2);
     CDRawFrame *cotf;//コントロールパネルクラスの変数

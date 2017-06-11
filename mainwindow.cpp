@@ -7,7 +7,8 @@
 #include "tracer.h"
 #include <QGraphicsTextItem>
 #include <QGraphicsItem>
-#define TEMP_RATE 1000
+
+#define TEMP_RATE 3000
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow){
 
@@ -16,12 +17,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     InitView1();
     InitView2();
 
+		//TODO:: Enrich color pattern
+		my_color.push_back("red");
+		my_color.push_back("blue");
+		my_color.push_back("green");
+		my_color.push_back("pink");
+
     cotf = new CDRawFrame(0,(QObject*)this);
 	  browser = new Browser(0,(QObject*)this);
 
     vsplit2=getGBSplitter(m_view1,browser);
     vsplit4=getGGSplitter(m_view2);
-
 
     QSplitter *vsplit = new QSplitter(Qt::Vertical);
     vsplit->addWidget(vsplit2);
@@ -98,7 +104,7 @@ void MainWindow::InitView1(){
 	core7->setPos(base_x,base_y); base_y+=space;
 
   m_scene1 = new QGraphicsScene();
-  m_scene1->setSceneRect(-20,-30,4000,380);
+  m_scene1->setSceneRect(-20,-30,10000,380);
 
   m_scene1->addItem(core0);
   m_scene1->addItem(core1);
@@ -114,17 +120,16 @@ void MainWindow::InitView1(){
 }
 
 void MainWindow::InitView2(){
-    item2 = new QGraphicsEllipseItem(100, 100, 200, 100);
-    item2->setBrush(QBrush(QColor("blue")));
+   // item2 = new QGraphicsEllipseItem(100, 100, 200, 100);
+   // item2->setBrush(QBrush(QColor("blue")));
     m_scene2 = new QGraphicsScene();
     m_scene2->setSceneRect(-20,-30,640,480);
-    m_scene2->addItem(item2);
+  //  m_scene2->addItem(item2);
     m_view2 = new QGraphicsView();
-    m_view2->setScene(m_scene2);
 }
 
 void MainWindow::StartStopTrace(bool click){
-//	setuid(0);
+
 	if (click){
 		SchedViz::Tracer tracer;
 		tracer.setup();
@@ -134,7 +139,7 @@ void MainWindow::StartStopTrace(bool click){
 		tracer.reset();
 		viz_process(tracer.get_info());
 	}
-	//setuid(getuid());
+
 }
 
 void MainWindow::valid_node_viz(){
@@ -147,23 +152,29 @@ void MainWindow::quit(){
 
 void MainWindow::viz_process(std::vector<trace_info_t> info){
 	double base_time = info[0].start_time;
-	double base_x = 70;
+	double base_x = 200;
 	double base_y = 40;
 	double width =0;
 	int height =20;
 	double x=0;
 	double y=0;
+	std::string color_flag = info[0].name;
+	int color_index=0;
 
 	for(int i=0;i<(int)info.size();i++){
 		x = info[i].start_time - base_time;
 		width = info[i].runtime;
 		y = info[i].core * base_y;
 		QGraphicsRectItem *process = new QGraphicsRectItem(x*TEMP_RATE+base_x,y,width*TEMP_RATE,height);
-		//temp ...
-		if(info[i].name == "3953")
-			process->setBrush(QBrush(QColor("pink")));
-		else
-			process->setBrush(QBrush(QColor("red")));
+
+		// Change Color each by PID
+		if(info[i].name != color_flag){
+			color_index++;
+		}
+
+		process->setBrush(QBrush(QColor(my_color[color_index])));
+		color_flag = info[i].name;
+
 //		process->setFlags(QGraphicsItem::ItemIsFocusable | QGraphicsItem::ItemIsSelectable);
 		process_info.push_back(process);
 		m_scene1->addItem(process_info[i]);

@@ -227,7 +227,7 @@ void Tracer::create_process_info(
 			// start time
 			if(buf.find(find_next_pid.at(i)) != -1){
 				start_time_s = split(trim(buf),delim);
-				start_time_i = strtod(start_time_s[3].c_str(),NULL); 
+				start_time_i = strtod(start_time_s[2].c_str(),NULL); 
 				trace_info.name = find_next_pid.at(i).substr(9); //pid
 				trace_info.start_time = start_time_i;
 				trace_info.core = ctoi(start_time_s[0]);
@@ -236,7 +236,7 @@ void Tracer::create_process_info(
 			// end time
 			if(buf.find(find_prev_pid.at(i)) != -1){
 				finish_time_s = split(trim(buf),delim);
-				finish_time_i = strtod(finish_time_s[3].c_str(),NULL);
+				finish_time_i = strtod(finish_time_s[2].c_str(),NULL);
 				trace_info.runtime = finish_time_i - start_time_i;
 				v_trace_info.push_back(trace_info); 
 
@@ -246,7 +246,7 @@ void Tracer::create_process_info(
 	}
 
 	//sort by start_time
-	std::sort(v_trace_info.begin(),v_trace_info.end());
+	//std::sort(v_trace_info.begin(),v_trace_info.end());
 for(int i=0;i<(int)v_trace_info.size();i++){
 		std::cout<< v_trace_info[i].name;
 		printf(" core: %d, s_time: %f. r_time: %f\n"

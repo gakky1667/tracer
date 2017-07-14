@@ -43,7 +43,6 @@ public:
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         StartButton = new QPushButton(CDRawFrame);
         StartButton->setObjectName(QString::fromUtf8("StartButton"));
-				StartButton->setCheckable(true);
 
         horizontalLayout->addWidget(StartButton);
 
@@ -69,8 +68,8 @@ public:
     void retranslateUi(QFrame *CDRawFrame)
     {
         CDRawFrame->setWindowTitle(QApplication::translate("CDRawFrame", "Frame", 0, QApplication::UnicodeUTF8));
-        StartButton->setText(QApplication::translate("CDRawFrame", "Start/Stop", 0, QApplication::UnicodeUTF8));
-        StopButton->setText(QApplication::translate("CDRawFrame", "hoge", 0, QApplication::UnicodeUTF8));
+        StartButton->setText(QApplication::translate("CDRawFrame", "Start", 0, QApplication::UnicodeUTF8));
+        StopButton->setText(QApplication::translate("CDRawFrame", "Stop", 0, QApplication::UnicodeUTF8));
         CloseButton->setText(QApplication::translate("CDRawFrame", "Close", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 

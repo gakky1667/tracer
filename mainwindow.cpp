@@ -7,149 +7,135 @@
 #include "tracer.h"
 #include <QGraphicsTextItem>
 #include <QGraphicsItem>
-
+#include <QGroupBox>
+#include <QMessageBox>
+#include <QTextEdit>
 #define TEMP_RATE 3000
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow){
 
-    ui->setupUi(this);
+	ui->setupUi(this);
 
-    InitView1();
-    InitView2();
+	setWindowTitle(tr("ROSHC: TRACER"));
+	NodeGroup = createNodeGroup();
+	
+	QVBoxLayout *toplayout = new QVBoxLayout;
+	toplayout->addWidget(createCPUGroup());
+	toplayout->addWidget(NodeGroup);
+	toplayout->addWidget(createTextBrowser());
+	toplayout->addWidget(createButtonGroup());
+	
+	QWidget *window = new QWidget();
+	window->setLayout(toplayout);
 
-		//TODO:: Enrich color pattern
-		my_color.push_back("red");
-		my_color.push_back("blue");
-		my_color.push_back("green");
-		my_color.push_back("pink");
-
-    cotf = new CDRawFrame(0,(QObject*)this);
-	  browser = new Browser(0,(QObject*)this);
-
-    vsplit2=getGBSplitter(m_view1,browser);
-    vsplit4=getGGSplitter(m_view2);
-
-    QSplitter *vsplit = new QSplitter(Qt::Vertical);
-    vsplit->addWidget(vsplit2);
-    vsplit->addWidget(vsplit4);
-    vsplit->addWidget(cotf);
-    setCentralWidget(vsplit);
-
+	NodeGroup->hide();
+	setCentralWidget(window);
 }
 
 MainWindow::~MainWindow(){
     delete ui;
 }
 
-QSplitter *MainWindow::getGBSplitter(QGraphicsView *lview1, Browser *tBrowser){
-    QSplitter *hsplit = new QSplitter(Qt::Horizontal);
-    hsplit->addWidget(lview1);
-    QSplitter *hsplit1 = new QSplitter(Qt::Horizontal);
-    hsplit1->addWidget(tBrowser);
-    hsplit->addWidget(hsplit1);
-    return hsplit;
+QGroupBox *MainWindow::createCPUGroup(){
+	QGroupBox *groupBox = new QGroupBox("CPUs");
+	QLabel *cpu0 = new QLabel("cpu 0");
+	QLabel *cpu1 = new QLabel("cpu 1");
+	QLabel *cpu2 = new QLabel("cpu 2");
+	QLabel *cpu3 = new QLabel("cpu 3");
+	QLabel *cpu4 = new QLabel("cpu 4");
+	QLabel *cpu5 = new QLabel("cpu 5");
+	QLabel *cpu6 = new QLabel("cpu 6");
+	QLabel *cpu7 = new QLabel("cpu 7");
+	QVBoxLayout *layout = new QVBoxLayout;
+
+	layout->addWidget(cpu0);
+	layout->addWidget(cpu1);
+	layout->addWidget(cpu2);
+	layout->addWidget(cpu3);
+  layout->addWidget(cpu4);
+	layout->addWidget(cpu5);
+	layout->addWidget(cpu6);
+	layout->addWidget(cpu7);
+	layout->addStretch(1);
+	groupBox->setLayout(layout);
+
+	return groupBox;
 }
 
+QGroupBox *MainWindow::createNodeGroup(){
+	QGroupBox *groupBox = new QGroupBox("Node");
+	QLabel *node0 = new QLabel("talker");
+	QLabel *node1 = new QLabel("listener");
+	QVBoxLayout *layout = new QVBoxLayout;
 
-QSplitter *MainWindow::getGGSplitter(QGraphicsView *lview1){
-	SchedViz::Tracer tracer;
+	layout->addWidget(node0);
+	layout->addWidget(node1);
+	layout->addStretch(1);
+	groupBox->setLayout(layout);
 
-	/**splitterの設定*/
-	QSplitter *hsplit = new QSplitter(Qt::Horizontal);
-	hsplit->addWidget(lview1);
-
-	QSplitter *hsplit1 = new QSplitter(Qt::Vertical);
-	for(int i(0); i < (int)tracer.v_node_info_.size(); i++){
-		hsplit1->addWidget(new QCheckBox(tr(tracer.v_node_info_.at(i).name.c_str())));
-		hsplit->addWidget(hsplit1);
-	}
-
-	QSplitter *vsplit = new QSplitter(Qt::Vertical);
-	vsplit->addWidget(new QPushButton(tr("Apply")));
-	hsplit1->addWidget(vsplit);
-	return hsplit;
+	return groupBox;
 }
 
-void MainWindow::InitView1(){
-	int base_x=0;
-	int base_y=0;
-	int space=40;
-	
-	//TODO:vector
-	QGraphicsTextItem *core0 = new QGraphicsTextItem();
-	QGraphicsTextItem *core1 = new QGraphicsTextItem();
-	QGraphicsTextItem *core2 = new QGraphicsTextItem();
-	QGraphicsTextItem *core3 = new QGraphicsTextItem();
-	QGraphicsTextItem *core4 = new QGraphicsTextItem();
-	QGraphicsTextItem *core5 = new QGraphicsTextItem();
-	QGraphicsTextItem *core6 = new QGraphicsTextItem();
-	QGraphicsTextItem *core7 = new QGraphicsTextItem();
+QGroupBox *MainWindow::createTextBrowser(){
+	QGroupBox *groupBox = new QGroupBox("Node Info");
+	QTextBrowser *browser = new QTextBrowser;
+	QVBoxLayout *layout = new QVBoxLayout;
 
-	core0->setPlainText("core 0");
-	core1->setPlainText("core 1");
-	core2->setPlainText("core 2");
-	core3->setPlainText("core 3");
-	core4->setPlainText("core 4");
-	core5->setPlainText("core 5");
-	core6->setPlainText("core 6");
-	core7->setPlainText("core 7");
-		
-	core0->setPos(base_x,base_y); base_y+=space;
-	core1->setPos(base_x,base_y); base_y+=space;
-	core2->setPos(base_x,base_y); base_y+=space;
-	core3->setPos(base_x,base_y); base_y+=space;
-	core4->setPos(base_x,base_y); base_y+=space;
-	core5->setPos(base_x,base_y); base_y+=space;
-	core6->setPos(base_x,base_y); base_y+=space;
-	core7->setPos(base_x,base_y); base_y+=space;
+	layout->addWidget(browser);
+	layout->addStretch();
+	browser->setText("Here, Node's informations are shown \n(e.g, PID, prio,...)");
+	groupBox->setLayout(layout);
 
-  m_scene1 = new QGraphicsScene();
-  m_scene1->setSceneRect(-20,-30,10000,380);
-
-  m_scene1->addItem(core0);
-  m_scene1->addItem(core1);
-  m_scene1->addItem(core2);
-  m_scene1->addItem(core3);
-  m_scene1->addItem(core4);
-  m_scene1->addItem(core5);
-  m_scene1->addItem(core6);
-  m_scene1->addItem(core7);
-
-  m_view1 = new QGraphicsView();//viewの生成
-  m_view1->setScene(m_scene1);//viewにsceneをセット
+	return groupBox;
 }
 
-void MainWindow::InitView2(){
-   // item2 = new QGraphicsEllipseItem(100, 100, 200, 100);
-   // item2->setBrush(QBrush(QColor("blue")));
-    m_scene2 = new QGraphicsScene();
-    m_scene2->setSceneRect(-20,-30,640,480);
-  //  m_scene2->addItem(item2);
-    m_view2 = new QGraphicsView();
+QGroupBox *MainWindow::createButtonGroup(){
+	QGroupBox *groupBox = new QGroupBox("Operations");
+	QPushButton *StartStopButton = new QPushButton("Start/Stop");
+	QPushButton *NodeListButton = new QPushButton("Node List View");
+	QPushButton *CloseButton = new QPushButton("Close");
+	QHBoxLayout *layout = new QHBoxLayout;
+
+	layout->addWidget(StartStopButton);
+	layout->addWidget(NodeListButton);
+	layout->addWidget(CloseButton);
+	layout->addStretch(1);
+	groupBox->setLayout(layout);
+
+	StartStopButton->setCheckable(true);
+	NodeListButton->setCheckable(true);
+
+	QObject::connect(StartStopButton, SIGNAL(toggled(bool)), this, SLOT(StartStopTrace(bool)));  
+	QObject::connect(NodeListButton, SIGNAL(toggled(bool)), this, SLOT(ShowNodes(bool)));  
+	QObject::connect(CloseButton, SIGNAL(clicked()), this, SLOT(quit()));
+
+	return groupBox;
 }
 
 void MainWindow::StartStopTrace(bool click){
-
-	if (click){
+  if (click){
 		SchedViz::Tracer tracer;
 		tracer.setup();
 		tracer.start_ftrace();
 	}else{
-		SchedViz::Tracer tracer; 
+ 		SchedViz::Tracer tracer; 
 		tracer.reset();
-		viz_process(tracer.get_info());
+	//	viz_process(tracer.get_info());
 	}
-
 }
 
-void MainWindow::valid_node_viz(){
-	QMessageBox::warning(0,"View1","View1message"); 
+void MainWindow::ShowNodes(bool click){
+
+	if(click){
+	  NodeGroup->show();	
+	}
+	else{
+		NodeGroup->hide();
+	}
 }
 
-void MainWindow::quit(){
-	exit(1);
-}
 
+#if 0
 void MainWindow::viz_process(std::vector<trace_info_t> info){
 	double base_time = info[0].start_time;
 	double base_x = 200;
@@ -181,4 +167,8 @@ void MainWindow::viz_process(std::vector<trace_info_t> info){
 		m_view1->setScene(m_scene1);
 	}
 
+}
+#endif
+void MainWindow::quit(){
+	exit(1);
 }

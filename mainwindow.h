@@ -10,6 +10,7 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include "tracer.h"
+#include <QGroupBox>
 
 class QMenu;
 class SecondDialog;
@@ -27,6 +28,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+		QGroupBox *NodeGroup;
 private:
     Ui::MainWindow *ui;
     QGraphicsView *m_view1;//add
@@ -43,6 +45,7 @@ private:
 
     void InitView1();
     void InitView2();
+		void InitLayout();
 		void viz_process(std::vector<trace_info_t> info);
 
 		std::vector<QColor> my_color;
@@ -53,10 +56,14 @@ private:
     CDRawFrame *cotf;//コントロールパネルクラスの変数
     Browser *browser;
 
+		QGroupBox *createCPUGroup();
+		QGroupBox *createNodeGroup();
+		QGroupBox *createTextBrowser();
+		QGroupBox *createButtonGroup();
 
 public slots:
 	void StartStopTrace(bool click);//View1に対してのslot関数
-	void valid_node_viz();
-  void quit();
+	void ShowNodes(bool click);
+	void quit();
 
 };

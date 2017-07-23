@@ -75,108 +75,149 @@ unsigned int Tracer::get_pid(std::string name){
 	return pid;
 }
 
-void Tracer::setup(){
-	system("mount -t debugfs nodev /sys/kernel/debug/");
-	Tracer::filter_pid(true);
-	Tracer::set_tracing_on((char*)"0");
-	Tracer::set_trace((char*)"0");
-	Tracer::set_events_enable((char*)"1");
-	Tracer::set_event((char*)"sched:sched_switch");
-	Tracer::set_current_tracer((char*)"function");
+void Tracer::setup(std::string userPass){
+	Tracer::mount(true,userPass);
+	Tracer::filter_pid(true,userPass);
+	Tracer::set_tracing_on(0, userPass);
+	Tracer::set_trace(0,userPass);
+	Tracer::set_events_enable(1,userPass);
+	Tracer::set_event((std::string)"sched:sched_switch",userPass);
+	Tracer::set_current_tracer((std::string)"function",userPass);
 }
 
-void Tracer::reset(){
-	Tracer::set_tracing_on((char*)"0");
-	Tracer::set_events_enable((char*)"0");
-	Tracer::output_log();
-	Tracer::filter_pid(false);
-	system("umount /sys/kernel/debug/");
+void Tracer::reset(std::string userPass){
+	Tracer::set_tracing_on(0,userPass);
+	Tracer::set_events_enable(0,userPass);
+	Tracer::output_log(userPass);
+	Tracer::filter_pid(false,userPass);
+	Tracer::mount(false,userPass);
 	Tracer::extract_period();
 }
 
+void Tracer::mount(bool mode, std::string userPass){
+	std::string first_com = "echo "; 
+	std::string second_com;
+	int pass_is_TorF;
 
-void Tracer::set_tracing_on(char *mode){
-	std::ofstream _set_tracing_on("/sys/kernel/debug/tracing/tracing_on");
-	_set_tracing_on << mode << std::endl;
-	if(_set_tracing_on.fail()){
-		std::cerr << "open error" << std::endl;
-    exit(1);
-  }
-}
+	switch (mode){
+		case true:
+			second_com = "| sudo -S mount -t debugfs nodev /sys/kernel/debug/"; break;
+	  case false:
+			second_com = "| sudo -S umount /sys/kernel/debug/"; break; 
+		default:
+			break;
+	}
 
-void Tracer::set_trace(char *mode){
-	std::ofstream _set_trace("/sys/kernel/debug/tracing/trace");
-	_set_trace << mode << std::endl;
-	if(_set_trace.fail()){
-		std::cerr << "open error" << std::endl;
+	first_com += (userPass + second_com);
+	pass_is_TorF = system(first_com.c_str());
+
+	if(pass_is_TorF != 0){ 
+		std::cout << "password is incorrect "<< std::endl;
+		std::cout << "Will close a program" << std::endl;
 		exit(1);
 	}
 }
 
-void Tracer::set_events_enable(char *mode){
-	std::ofstream _set_events_enable("/sys/kernel/debug/tracing/events/enable");
-	_set_events_enable << mode << std::endl;
-	if(_set_events_enable.fail()){
-		std::cerr << "open error" << std::endl;
-		exit(1);
-  }
-}
+void Tracer::set_tracing_on(int mode, std::string userPass){
+	std::string first_com = "echo ";
+	std::string second_com;
 
-void Tracer::set_current_tracer(char *mode){
-	std::ofstream _set_current_tracer("/sys/kernel/debug/tracing/current_tracer");
-	_set_current_tracer << mode << std::endl;
-	if(_set_current_tracer.fail()){
-		std::cerr << "open error" << std::endl;
-    exit(1);
-  }
-}
-
-void Tracer::set_event(char *mode){
-	std::ofstream _set_event("/sys/kernel/debug/tracing/set_event");
-	_set_event << mode << std::endl;
-	if(_set_event.fail()){
-		std::cerr << "open error" << std::endl;
-    exit(1);
-  }
-}
-
-void Tracer::start_ftrace(){
-	std::cout << "Trace start " << std::endl;
-	std::ofstream _set_ftrace("/sys/kernel/debug/tracing/tracing_on");
-	_set_ftrace << 1 << std::endl;
-}
-
-void Tracer::output_log(){
-	std::ifstream _trace_log("/sys/kernel/debug/tracing/trace");
-	//std::ifstream _trace_log("/sys/kernel/debug/tracing/trace_pipe");
-	std::ofstream trace_log("./trace.log");
-	std::string str;
-
-	std::cout << "Trace finish"<< str << std::endl;
-
-	while(_trace_log && getline(_trace_log,str))
-		trace_log << str << std::endl;
-
-}
-
-void Tracer::filter_pid(bool mode){
-
-	std::ofstream _filter_pid("/sys/kernel/debug/tracing/set_ftrace_pid", std::ios::out | std::ios::app);
-
-	if(_filter_pid.fail()){
-		std::cerr << "open error filter" << std::endl;
-		exit(1);
+	switch (mode){
+		case 0:
+			second_com = " | sudo -S sh -c \"echo \'0\' > /sys/kernel/debug/tracing/tracing_on\"";
+			first_com += (userPass + second_com); break;
+		case 1:
+			second_com = " | sudo -S sh -c \"echo \'1\' > /sys/kernel/debug/tracing/tracing_on\"";
+			first_com += (userPass + second_com); break;
+		default:
+			break;
 	}
+	system(first_com.c_str());
+}
 
-	if(mode == false){
-		_filter_pid << "" << std::endl;
+void Tracer::set_trace(int mode, std::string userPass){
+	std::string first_com = "echo ";
+	std::string second_com;
+
+	switch (mode){
+		case 0:
+			second_com = " | sudo -S sh -c \"echo \'0\' > /sys/kernel/debug/tracing/trace\"";
+			first_com += (userPass + second_com); break;
+	  case 1:
+			second_com = " | sudo -S sh -c \"echo \'1\' > /sys/kernel/debug/tracing/trace\"";
+			first_com += (userPass + second_com); break;
+    default:
+			break;
 	}
-	else{
-		for (int i(0); i < (int)v_node_info_.size(); ++i) {
-			_filter_pid << v_node_info_.at(i).pid << std::endl;
+	system(first_com.c_str());
+}
+
+void Tracer::set_events_enable(int mode, std::string userPass){
+	std::string first_com = "echo ";
+	std::string second_com;
+
+	switch (mode){
+		case 0:
+			second_com = " | sudo -S sh -c \"echo \'0\' > /sys/kernel/debug/tracing/events/enable\"";
+			first_com += (userPass + second_com); break;
+		case 1:
+			second_com = " | sudo -S sh -c \"echo \'1\' > /sys/kernel/debug/tracing/events/enable\"";
+			first_com += (userPass + second_com); break;
+		default:
+			break;
+	}
+	system(first_com.c_str());
+}
+
+void Tracer::set_current_tracer(std::string mode, std::string userPass){
+	std::string first_com = "echo ";
+	std::string second_com = " | sudo -S sh -c \"echo \'";
+	std::string third_com = "\' > /sys/kernel/debug/tracing/current_tracer\"";
+	
+	first_com += (userPass + second_com + mode + third_com);
+
+	system(first_com.c_str());
+}
+
+void Tracer::set_event(std::string mode, std::string userPass){
+	std::string first_com = "echo ";
+	std::string second_com = " | sudo -S sh -c \"echo \'";
+	std::string third_com = "\' > /sys/kernel/debug/tracing/set_event\"";
+	
+	first_com += (userPass + second_com + mode + third_com);
+	system(first_com.c_str());
+}
+
+void Tracer::start_ftrace(std::string userPass){
+	std::string start_com = "echo ";
+	std::string second_com = "| sudo -S sh -c \"echo \'1\' > /sys/kernel/debug/tracing/tracing_on\"";
+	start_com += (userPass + second_com);
+	system(start_com.c_str());
+}
+
+void Tracer::output_log(std::string userPass){
+	std::string first_com = "echo ";
+	std::string second_com = "| sudo -S sh -c \"cat /sys/kernel/debug/tracing/trace > ./ftrace.log\""; 
+	first_com += userPass + second_com;
+	system(first_com.c_str());
+}
+
+void Tracer::filter_pid(bool mode, std::string userPass){
+	std::string first_com = "echo ";
+	std::string second_com = " | sudo -S sh -c \"echo \'";
+ 	std::string third_com = "\' > /sys/kernel/debug/tracing/trace\"";
+	std::ostringstream pids;
+
+	if(mode == true){
+		for (int i(0); i < (int)v_node_info_.size(); ++i){
+			pids <<  v_node_info_.at(i).pid << " ";	
 		}
-  }
+	}
+			
+	first_com += (userPass + second_com);
+	first_com += (pids.str() + third_com);
 
+	system(first_com.c_str());
 }
 
 
@@ -239,21 +280,22 @@ void Tracer::create_process_info(
 				finish_time_i = strtod(finish_time_s[2].c_str(),NULL);
 				trace_info.runtime = finish_time_i - start_time_i;
 				v_trace_info.push_back(trace_info); 
-
-
 			}
 		}
 	}
 
 	//sort by start_time
-	//std::sort(v_trace_info.begin(),v_trace_info.end());
-for(int i=0;i<(int)v_trace_info.size();i++){
+	std::sort(v_trace_info.begin(),v_trace_info.end());
+
+#if 0
+	for(int i=0;i<(int)v_trace_info.size();i++){
 		std::cout<< v_trace_info[i].name;
 		printf(" core: %d, s_time: %f. r_time: %f\n"
 				,v_trace_info[i].core
-				,v_trace_info[i].start_time, v_trace_info[i].runtime);}
+				,v_trace_info[i].start_time, v_trace_info[i].runtime);
+	}
+#endif
 }
-
 
 
  // Separate trace.log by spaces

@@ -35,9 +35,9 @@ public:
 	Tracer();
 	~Tracer();
 	FILE *fp;
-	void setup();
-	void reset();
-	void start_ftrace();
+	void setup(std::string);
+	void reset(std::string);
+	void start_ftrace(std::string);
 	
 	std::vector<trace_info_t> get_info();
 	std::vector<node_info_t> v_node_info_;
@@ -47,13 +47,14 @@ private:
   Config config_;
 
   unsigned int get_pid(std::string name);
-  void set_tracing_on(char *mode);
-  void set_trace(char *mode);
-  void set_events_enable(char *mode);
-  void set_current_tracer(char *mode);
-  void set_event(char *mode);
-  void output_log();
-  void filter_pid(bool mode);
+	void mount(bool,std::string);
+  void set_tracing_on(int mode, std::string);
+  void set_trace(int mode, std::string);
+  void set_events_enable(int mode, std::string);
+  void set_current_tracer(std::string, std::string);
+  void set_event(std::string, std::string);
+  void output_log(std::string);
+  void filter_pid(bool mode, std::string);
 	void extract_period();
 	void create_process_info(
 			std::vector<std::string> find_prev_pids,

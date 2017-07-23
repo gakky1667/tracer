@@ -10,11 +10,15 @@
 #include <QGroupBox>
 #include <QMessageBox>
 #include <QTextEdit>
+#include <string>
+#include <QtCore/QString>
 #define TEMP_RATE 3000
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow){
 
 	ui->setupUi(this);
+
+	requirePass();
 
 	setWindowTitle(tr("ROSHC: TRACER"));
 	NodeGroup = createNodeGroup();
@@ -34,6 +38,36 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
 MainWindow::~MainWindow(){
     delete ui;
+}
+
+void MainWindow::requirePass(){
+	passWindow = new QDialog;
+	QLabel *label = new QLabel("pass: ");
+	QLineEdit *edit = new QLineEdit;
+	QPushButton *button = new QPushButton("ok");
+	QHBoxLayout *layout = new QHBoxLayout;
+
+	QObject::connect(edit, SIGNAL(textChanged(const QString &)),this, SLOT(setPass(const QString &)));
+	QObject::connect(button,SIGNAL(clicked()),this,SLOT(onSetPass()));
+
+	layout->addWidget(label);
+	layout->addWidget(edit);
+	layout->addWidget(button);
+	passWindow->setWindowTitle("Password");
+	passWindow->setLayout(layout);
+	
+
+	passWindow->show();
+}
+
+void MainWindow::setPass(const QString &input){
+	if(input!=pass){
+		pass = input;
+	}
+}
+
+void MainWindow::onSetPass(){
+	passWindow->hide();
 }
 
 QGroupBox *MainWindow::createCPUGroup(){
@@ -62,6 +96,7 @@ QGroupBox *MainWindow::createCPUGroup(){
 	return groupBox;
 }
 
+// push_back
 QGroupBox *MainWindow::createNodeGroup(){
 	QGroupBox *groupBox = new QGroupBox("Node");
 	QLabel *node0 = new QLabel("talker");
@@ -115,11 +150,11 @@ QGroupBox *MainWindow::createButtonGroup(){
 void MainWindow::StartStopTrace(bool click){
   if (click){
 		SchedViz::Tracer tracer;
-		tracer.setup();
-		tracer.start_ftrace();
+		tracer.setup(pass.toStdString());
+		tracer.start_ftrace(pass.toStdString());
 	}else{
  		SchedViz::Tracer tracer; 
-		tracer.reset();
+		tracer.reset(pass.toStdString());
 	//	viz_process(tracer.get_info());
 	}
 }

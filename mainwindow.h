@@ -29,26 +29,14 @@ public:
     ~MainWindow();
 
 		QGroupBox *NodeGroup;
+		QDialog *passWindow;
 private:
     Ui::MainWindow *ui;
-    QGraphicsView *m_view1;//add
-    QGraphicsScene *m_scene1;//add
-    QGraphicsView *m_view2;//add
-    QGraphicsScene *m_scene2;//add
 
-
-    QSplitter *vsplit2;
-    QSplitter *vsplit4;
-
-    QGraphicsEllipseItem *item1;//描画用
-    QGraphicsEllipseItem *item2;
-
-    void InitView1();
-    void InitView2();
-		void InitLayout();
 		void viz_process(std::vector<trace_info_t> info);
+		void requirePass();
 
-		std::vector<QColor> my_color;
+		QString pass;
 
 		std::vector<QGraphicsRectItem*> process_info;
     QSplitter *getGBSplitter(QGraphicsView *lview1,Browser *tBrowser);
@@ -65,5 +53,7 @@ public slots:
 	void StartStopTrace(bool click);//View1に対してのslot関数
 	void ShowNodes(bool click);
 	void quit();
+	void setPass(const QString &);
+	void onSetPass();
 
 };

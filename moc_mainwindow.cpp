@@ -22,7 +22,7 @@ static const uint qt_meta_data_MainWindow[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-       3,   14, // methods
+       5,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -33,13 +33,16 @@ static const uint qt_meta_data_MainWindow[] = {
       18,   12,   11,   11, 0x0a,
       39,   12,   11,   11, 0x0a,
       55,   11,   11,   11, 0x0a,
+      62,   11,   11,   11, 0x0a,
+      79,   11,   11,   11, 0x0a,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_MainWindow[] = {
     "MainWindow\0\0click\0StartStopTrace(bool)\0"
-    "ShowNodes(bool)\0quit()\0"
+    "ShowNodes(bool)\0quit()\0setPass(QString)\0"
+    "onSetPass()\0"
 };
 
 void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -51,6 +54,8 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 0: _t->StartStopTrace((*reinterpret_cast< bool(*)>(_a[1]))); break;
         case 1: _t->ShowNodes((*reinterpret_cast< bool(*)>(_a[1]))); break;
         case 2: _t->quit(); break;
+        case 3: _t->setPass((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 4: _t->onSetPass(); break;
         default: ;
         }
     }
@@ -88,9 +93,9 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 3)
+        if (_id < 5)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 3;
+        _id -= 5;
     }
     return _id;
 }

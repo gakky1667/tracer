@@ -306,13 +306,14 @@ void Tracer::create_process_info(
 
     //sort by start_time
     std::sort(v_trace_info.begin(),v_trace_info.end());
-	
+#if 0	
     for(int i=0;i<(int)v_trace_info.size();i++){
         std::cout<< v_trace_info[i].name;
         printf(" core: %d, s_time: %f. r_time: %f\n"
                 ,v_trace_info[i].core
                 ,v_trace_info[i].start_time, v_trace_info[i].runtime);
     }
+#endif 
 }
 
 

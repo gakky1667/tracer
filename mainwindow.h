@@ -17,8 +17,6 @@
 class QMenu;
 class SecondDialog;
 
-extern int width_;
-
 namespace Ui {
 class MainWindow;
 }
@@ -32,28 +30,28 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-        QGroupBox *NodeGroup;
-        QDialog *passWindow;
+    QGroupBox *NodeGroup;
+    QDialog *passWindow;
+
 private:
     Ui::MainWindow *ui;
 
-  //      void viz_process(std::vector<trace_info_t> info);
-        void requirePass();
+    void viz_process(std::vector<trace_info_t> info);
+    void requirePass();
 
-        QString pass;
+    QString pass;
 
-        std::vector<QGraphicsRectItem*> process_info;
-        QGraphicsView *view;
-        QGraphicsScene *scene;
-        MySquare *square;
-        MySquare *square1;
+		std::vector<MySquare*> process_info;
+    QGraphicsView *view;
+    QGraphicsScene *scene;
+    MySquare *square;
+    MySquare *square1;
+		QTextBrowser *browser;
 
-        QPushButton *zoomInButton;
-
-        QGroupBox *createCPUGroup();
-        QGroupBox *createNodeGroup();
-        QGroupBox *createTextBrowser();
-        QGroupBox *createButtonGroup();
+    QGroupBox *createCPUGroup();
+    QGroupBox *createNodeGroup();
+    QGroupBox *createTextBrowser();
+    QGroupBox *createButtonGroup();
 
 public slots:
     void StartStopTrace(bool click);//View1に対してのslot関数

@@ -16,8 +16,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include "mysquare.h"
-#define TEMP_RATE 3000
-
+#define ZOOM 1000
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow){
 
@@ -106,13 +105,13 @@ QGroupBox *MainWindow::createCPUGroup(){
     QBrush blueBrush(Qt::blue);
     QPen blackpen(Qt::black);
     blackpen.setWidth(1);
-
+#if 0
     // temp
     square = new MySquare(0,0,50);
     scene->addItem(square);
     square1 = new MySquare(10,100,50);
     scene->addItem(square1);
-
+#endif
 
     view = new QGraphicsView(scene);
     toplayout->addWidget(view);
@@ -138,7 +137,7 @@ QGroupBox *MainWindow::createNodeGroup(){
 
 QGroupBox *MainWindow::createTextBrowser(){
     QGroupBox *groupBox = new QGroupBox("Node Info");
-    QTextBrowser *browser = new QTextBrowser;
+    browser = new QTextBrowser;
     QVBoxLayout *layout = new QVBoxLayout;
 
     layout->addWidget(browser);
@@ -174,14 +173,14 @@ QGroupBox *MainWindow::createButtonGroup(){
 
 void MainWindow::StartStopTrace(bool click){
   if (click){
-        SchedViz::Tracer tracer;
-        tracer.setup(pass.toStdString());
-        tracer.start_ftrace(pass.toStdString());
-    }else{
-        SchedViz::Tracer tracer;
-        tracer.reset(pass.toStdString());
-    //	viz_process(tracer.get_info());
-    }
+    SchedViz::Tracer tracer;
+    tracer.setup(pass.toStdString());
+    tracer.start_ftrace(pass.toStdString());
+  }else{
+    SchedViz::Tracer tracer;
+    tracer.reset(pass.toStdString());
+    viz_process(tracer.get_info());
+  }
 }
 
 void MainWindow::ShowNodes(bool click){
@@ -195,40 +194,26 @@ void MainWindow::ShowNodes(bool click){
 }
 
 
-#if 0
 void MainWindow::viz_process(std::vector<trace_info_t> info){
-    double base_time = info[0].start_time;
-    double base_x = 200;
-    double base_y = 40;
-    double width =0;
-    int height =20;
-    double x=0;
-    double y=0;
-    std::string color_flag = info[0].name;
-    int color_index=0;
+  double base_time = info[0].start_time;
+  double base_x = 200;
+  double base_y = 40;
+  double width =0;
+  double x=0;
+  double y=0;
 
-    for(int i=0;i<(int)info.size();i++){
-        x = info[i].start_time - base_time;
-        width = info[i].runtime;
-        y = info[i].core * base_y;
-        QGraphicsRectItem *process = new QGraphicsRectItem(x*TEMP_RATE+base_x,y,width*TEMP_RATE,height);
+  for(int i=0;i<(int)info.size();i++){
+    x = info[i].start_time - base_time;
+    width = info[i].runtime;
+    y = info[i].core * base_y;
 
-        // Change Color each by PID
-        if(info[i].name != color_flag){
-            color_index++;
-        }
+    square = new MySquare(x*ZOOM+base_x,y,width*ZOOM,info[i],browser);
 
-        process->setBrush(QBrush(QColor(my_color[color_index])));
-        color_flag = info[i].name;
-
-//		process->setFlags(QGraphicsItem::ItemIsFocusable | QGraphicsItem::ItemIsSelectable);
-        process_info.push_back(process);
-        m_scene1->addItem(process_info[i]);
-        m_view1->setScene(m_scene1);
-    }
-
+    process_info.push_back(square); 
+    scene->addItem(process_info[i]);		
+  }
 }
-#endif
+
 void MainWindow::quit(){
     exit(1);
 }

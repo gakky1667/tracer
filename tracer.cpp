@@ -22,7 +22,7 @@ Tracer::Tracer() : config_(){
 Tracer::~Tracer(){}
 
 void Tracer::load_config_(const std::string &filename) {
-  std::cout << filename << std::endl;
+  //std::cout << filename << std::endl;
 
   try {
     YAML::Node node_list;
@@ -77,11 +77,11 @@ unsigned int Tracer::get_pid(std::string name){
 
 void Tracer::setup(std::string userPass){
     Tracer::mount(true,userPass);
-    Tracer::filter_pid(true,userPass);
     Tracer::set_tracing_on(0, userPass);
     Tracer::set_trace(0,userPass);
     Tracer::set_events_enable(1,userPass);
-    Tracer::set_event((std::string)"sched:sched_switch",userPass);
+    Tracer::filter_pid(true,userPass);
+		Tracer::set_event((std::string)"sched:sched_switch",userPass);
     Tracer::set_current_tracer((std::string)"function",userPass);
 }
 
@@ -111,11 +111,13 @@ void Tracer::mount(bool mode, std::string userPass){
     first_com += (userPass + second_com);
     pass_is_TorF = system(first_com.c_str());
 
+		/*TODO deal with wrong password
     if(pass_is_TorF != 0){
         std::cout << "password is incorrect "<< std::endl;
         std::cout << "Will close a program" << std::endl;
         exit(1);
     }
+		*/
 		
 }
 
@@ -187,6 +189,7 @@ void Tracer::set_event(std::string mode, std::string userPass){
 
     first_com += (userPass + second_com + mode + third_com);
     system(first_com.c_str());
+
 }
 
 void Tracer::start_ftrace(std::string userPass){
@@ -206,25 +209,35 @@ void Tracer::output_log(std::string userPass){
 void Tracer::filter_pid(bool mode, std::string userPass){
     std::string first_com = "echo ";
     std::string second_com = " | sudo -S sh -c \"echo \'";
-    //std::string third_com = "\' > /sys/kernel/debug/tracing/trace\"";
-
-// 	  std::string third_com = "\' > set_ftrace_pid\"";
-
 		std::string third_com = "\' > /sys/kernel/debug/tracing/set_ftrace_pid\"";
     std::ostringstream pids;
 
+		// Initialize pids
+		pids.str(""); 
+		pids.clear(std::stringstream::goodbit);
+		first_com += (userPass + second_com);
+   	first_com += (pids.str() + third_com);
+   	system(first_com.c_str());
+
+	
     if(mode == true){
-        for (int i(0); i < (int)v_node_info_.size(); ++i){
-					pids <<  v_node_info_.at(i).pid << " ";
-				}
-    }
+			first_com = "echo ";
+   		
+			// loop pid's number times
+			for (int i(0); i < (int)v_node_info_.size(); ++i){
+				pids <<  v_node_info_.at(i).pid;
+			  first_com += (userPass + second_com);
+    		first_com += (pids.str() + third_com);
+			
+				pids.str("");
+				pids.clear(std::stringstream::goodbit);
 
-    first_com += (userPass + second_com);
-    first_com += (pids.str() + third_com);
-
-		std::cout << first_com.c_str() <<std::endl;
-
-    system(first_com.c_str());
+				system(first_com.c_str());
+				first_com = "echo ";
+			}
+    }else{
+    	system(first_com.c_str());
+		}
 }
 
 
@@ -275,7 +288,7 @@ void Tracer::create_process_info(
             // start time
             if(buf.find(find_next_pid.at(i)) != -1){
                 start_time_s = split(trim(buf),delim);
-                start_time_i = strtod(start_time_s[2].c_str(),NULL);
+                start_time_i = strtod(start_time_s[3].c_str(),NULL); //index of array is 2 or 3
                 trace_info.name = find_next_pid.at(i).substr(9); //pid
                 trace_info.start_time = start_time_i;
                 trace_info.core = ctoi(start_time_s[0]);
@@ -284,7 +297,7 @@ void Tracer::create_process_info(
             // end time
             if(buf.find(find_prev_pid.at(i)) != -1){
                 finish_time_s = split(trim(buf),delim);
-                finish_time_i = strtod(finish_time_s[2].c_str(),NULL);
+                finish_time_i = strtod(finish_time_s[3].c_str(),NULL); //index of array is 2 or 3
                 trace_info.runtime = finish_time_i - start_time_i;
                 v_trace_info.push_back(trace_info);
             }

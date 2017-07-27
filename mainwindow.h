@@ -3,17 +3,21 @@
 #include <QGraphicsScene>
 #include <QSplitter>
 #include <QGraphicsItem>
-#include "cdrawframe.h"//QFrameを基底クラスとしたコントロールパネルのクラス宣言
-#include "browser.h"
 #include <QtGui>
 #include <QTextBrowser>
 #include <QPushButton>
 #include <QCheckBox>
 #include "tracer.h"
 #include <QGroupBox>
+#include "mysquare.h"
+#include <QtCore>
+#include <QtGui>
+#include <QGraphicsView>
 
 class QMenu;
 class SecondDialog;
+
+extern int width_;
 
 namespace Ui {
 class MainWindow;
@@ -28,32 +32,34 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-		QGroupBox *NodeGroup;
-		QDialog *passWindow;
+        QGroupBox *NodeGroup;
+        QDialog *passWindow;
 private:
     Ui::MainWindow *ui;
 
-		void viz_process(std::vector<trace_info_t> info);
-		void requirePass();
+  //      void viz_process(std::vector<trace_info_t> info);
+        void requirePass();
 
-		QString pass;
+        QString pass;
 
-		std::vector<QGraphicsRectItem*> process_info;
-    QSplitter *getGBSplitter(QGraphicsView *lview1,Browser *tBrowser);
-    QSplitter *getGGSplitter(QGraphicsView *lview2);
-    CDRawFrame *cotf;//コントロールパネルクラスの変数
-    Browser *browser;
+        std::vector<QGraphicsRectItem*> process_info;
+        QGraphicsView *view;
+        QGraphicsScene *scene;
+        MySquare *square;
+        MySquare *square1;
 
-		QGroupBox *createCPUGroup();
-		QGroupBox *createNodeGroup();
-		QGroupBox *createTextBrowser();
-		QGroupBox *createButtonGroup();
+        QPushButton *zoomInButton;
+
+        QGroupBox *createCPUGroup();
+        QGroupBox *createNodeGroup();
+        QGroupBox *createTextBrowser();
+        QGroupBox *createButtonGroup();
 
 public slots:
-	void StartStopTrace(bool click);//View1に対してのslot関数
-	void ShowNodes(bool click);
-	void quit();
-	void setPass(const QString &);
-	void onSetPass();
+    void StartStopTrace(bool click);//View1に対してのslot関数
+    void ShowNodes(bool click);
+    void quit();
+    void setPass(const QString &);
+    void onSetPass();
 
 };

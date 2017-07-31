@@ -16,7 +16,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include "mysquare.h"
-#define ZOOM 1000
+
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow){
 
@@ -35,6 +35,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
   QWidget *window = new QWidget();
   window->setLayout(toplayout);
+	ZOOM = 1000;
 
   NodeGroup->hide();
   setCentralWidget(window);
@@ -77,42 +78,58 @@ void MainWindow::onSetPass(){
 }
 
 QGroupBox *MainWindow::createCPUGroup(){
-    QGroupBox *groupBox = new QGroupBox("CPUs");
-    QHBoxLayout *toplayout = new QHBoxLayout;
+  QGroupBox *groupBox = new QGroupBox("CPUs");
+  QVBoxLayout *toplayout = new QVBoxLayout;
+  QHBoxLayout *graph = new QHBoxLayout;
 
-    QLabel *cpu0 = new QLabel("cpu 0");
-    QLabel *cpu1 = new QLabel("cpu 1");
-    QLabel *cpu2 = new QLabel("cpu 2");
-    QLabel *cpu3 = new QLabel("cpu 3");
-    QLabel *cpu4 = new QLabel("cpu 4");
-    QLabel *cpu5 = new QLabel("cpu 5");
-    QLabel *cpu6 = new QLabel("cpu 6");
-    QLabel *cpu7 = new QLabel("cpu 7");
-    QVBoxLayout *layout = new QVBoxLayout;
+  QLabel *cpu0 = new QLabel("cpu 0");
+  QLabel *cpu1 = new QLabel("cpu 1");
+  QLabel *cpu2 = new QLabel("cpu 2");
+  QLabel *cpu3 = new QLabel("cpu 3");
+  QLabel *cpu4 = new QLabel("cpu 4");
+  QLabel *cpu5 = new QLabel("cpu 5");
+  QLabel *cpu6 = new QLabel("cpu 6");
+	QLabel *cpu7 = new QLabel("cpu 7");
+  QVBoxLayout *layout = new QVBoxLayout;
 
-    layout->addWidget(cpu0); layout->addStretch();
-    layout->addWidget(cpu1); layout->addStretch();
-    layout->addWidget(cpu2); layout->addStretch();
-    layout->addWidget(cpu3); layout->addStretch();
-    layout->addWidget(cpu4); layout->addStretch();
-    layout->addWidget(cpu5); layout->addStretch();
-    layout->addWidget(cpu6); layout->addStretch();
-    layout->addWidget(cpu7); layout->addStretch();
-    toplayout->addLayout(layout);
+  layout->addWidget(cpu0); layout->addStretch();
+  layout->addWidget(cpu1); layout->addStretch();
+  layout->addWidget(cpu2); layout->addStretch();
+  layout->addWidget(cpu3); layout->addStretch();
+  layout->addWidget(cpu4); layout->addStretch();
+  layout->addWidget(cpu5); layout->addStretch();
+  layout->addWidget(cpu6); layout->addStretch();
+  layout->addWidget(cpu7); layout->addStretch();
+  graph->addLayout(layout);
 
-    scene = new QGraphicsScene(this);
-    ui->graphicsView->setScene(scene);
+  scene = new QGraphicsScene(this);
+  ui->graphicsView->setScene(scene);
 
-    QBrush redBrush(Qt::red);
-    QBrush blueBrush(Qt::blue);
-    QPen blackpen(Qt::black);
-    blackpen.setWidth(1);
+  QBrush redBrush(Qt::red);
+  QBrush blueBrush(Qt::blue);
+  QPen blackpen(Qt::black);
+  blackpen.setWidth(1);
 
-    view = new QGraphicsView(scene);
-    toplayout->addWidget(view);
-    groupBox->setLayout(toplayout);
+  view = new QGraphicsView(scene);
+  graph->addWidget(view);
 
-    return groupBox;
+	QHBoxLayout *buttons = new QHBoxLayout;
+	QPushButton *ZoomOut = new QPushButton("Zoom Out");	
+  QPushButton *ZoomIn = new QPushButton("Zoom In");
+  buttons->addWidget(ZoomOut);
+  buttons->addWidget(ZoomIn);
+
+  QObject::connect(ZoomOut, SIGNAL(clicked()),
+				this, SLOT(zoom_out_process()));
+	QObject::connect(ZoomIn, SIGNAL(clicked()),
+				this, SLOT(zoom_in_process()));
+
+
+  toplayout->addLayout(graph);
+  toplayout->addLayout(buttons);
+  groupBox->setLayout(toplayout);
+
+  return groupBox;
 }
 
 QGroupBox *MainWindow::createNodeGroup(){
@@ -144,7 +161,6 @@ QGroupBox *MainWindow::createTextBrowser(){
     QVBoxLayout *layout = new QVBoxLayout;
 
     layout->addWidget(browser);
-    layout->addStretch();
     browser->setText("Here, Node's informations are shown \n(e.g, PID, prio,...)");
     groupBox->setLayout(layout);
 
@@ -178,14 +194,17 @@ QGroupBox *MainWindow::createButtonGroup(){
 }
 
 void MainWindow::StartStopTrace(bool click){
+
   if (click){
     SchedViz::Tracer tracer;
     tracer.setup(pass.toStdString());
     tracer.start_ftrace(pass.toStdString());
   }else{
+		int zoom = 1;
     SchedViz::Tracer tracer;
     tracer.reset(pass.toStdString());
-    viz_process(tracer.get_info());
+		info = tracer.get_info();
+    viz_process(info,zoom);
   }
 }
 
@@ -200,13 +219,15 @@ void MainWindow::ShowNodes(bool click){
 }
 
 
-void MainWindow::viz_process(std::vector<trace_info_t> info){
+void MainWindow::viz_process(std::vector<trace_info_t> info, double zoom){
   double base_time = info[0].start_time;
   double base_x = 200;
   double base_y = 40;
   double width =0;
   double x=0;
   double y=0;
+	
+	ZOOM += zoom;
 
 
   for(int i=0;i<(int)info.size();i++){
@@ -238,6 +259,31 @@ QColor MainWindow::get_color(int pid){
 	return color;
 }
 
-void MainWindow::quit(){
-    exit(1);
+void MainWindow::zoom_in_process(){
+
+	for(int i(0); i< (int)process_info.size();i++){
+		delete process_info[i];
+	}
+	process_info.resize(0);
+	viz_process(info,500);
+
 }
+
+void MainWindow::zoom_out_process(){
+
+	for(int i(0); i< (int)process_info.size();i++){
+		delete process_info[i];
+	}
+	process_info.resize(0);
+	
+	if(ZOOM - 500 <= 0)
+		viz_process(info,0);
+	else
+		viz_process(info,-500);
+
+}
+
+void MainWindow::quit(){
+  exit(1);
+}
+

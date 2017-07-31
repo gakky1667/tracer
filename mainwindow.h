@@ -36,7 +36,7 @@ public:
 private:
     Ui::MainWindow *ui;
 
-    void viz_process(std::vector<trace_info_t> info);
+    void viz_process(std::vector<trace_info_t> info, double zoom);
     void requirePass();
 
     QString pass;
@@ -48,6 +48,8 @@ private:
     MySquare *square;
 		QTextBrowser *browser;
 		std::vector<int> pid_list;
+		std::vector<trace_info_t> info;
+		double ZOOM;
 
     QGroupBox *createCPUGroup();
     QGroupBox *createNodeGroup();
@@ -58,10 +60,12 @@ private:
 		QColor colors[6] = {Qt::red, Qt::blue, Qt::green, Qt::yellow, Qt::magenta, Qt::cyan};
 
 public slots:
-    void StartStopTrace(bool click);//View1に対してのslot関数
+    void StartStopTrace(bool click);
     void ShowNodes(bool click);
     void quit();
     void setPass(const QString &);
     void onSetPass();
+		void zoom_out_process();
+		void zoom_in_process();
 
 };

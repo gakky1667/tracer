@@ -42,10 +42,10 @@ private:
     QString pass;
 
 		std::vector<MySquare*> process_info;
+		std::vector<QLabel*> label_list;
     QGraphicsView *view;
     QGraphicsScene *scene;
     MySquare *square;
-    MySquare *square1;
 		QTextBrowser *browser;
 
     QGroupBox *createCPUGroup();

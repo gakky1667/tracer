@@ -5,7 +5,7 @@
 MySquare::MySquare(int my_x, int my_y,int my_width, trace_info_t my_node_info, QTextBrowser *browser)
 {
     Pressed = false;
-    setFlag(ItemIsMovable);
+    setFlag(ItemIsSelectable);
     MyX = my_x;
     MyY = my_y;
     MyWidth = my_width;
@@ -23,7 +23,7 @@ QRectF MySquare::boundingRect() const
 void MySquare::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     QRectF rec = boundingRect();
-    QBrush brush(Qt::blue);
+    QBrush brush(Qt::blue); //default color
     QPen blackpen(Qt::black);
     blackpen.setWidth(6);
 
@@ -31,20 +31,40 @@ void MySquare::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         brush.setColor(Qt::red);
 				show_node_info();
     }else{
-        //brush.setColor(Qt::green);
+        brush.setColor(Qt::green); // TODO: Color-coded for each node
     }
 
     painter->fillRect(rec,brush);
     painter->drawRect(rec);
 }
 
-//TODO:: Show info in node_info_t
-void MySquare::show_node_info(){
+void MySquare::show_node_info()
+{
 	QString qstr;
+	std::stringstream ss;
+	std::stringstream sub_topic;
+	std::stringstream pub_topic;
+
+	for(int i(0); i<(int) MyNodeInfo.v_subtopic.size();i++){
+		sub_topic << MyNodeInfo.v_subtopic.at(i) << ", ";
+	}
+
+	for(int i(0); i<(int) MyNodeInfo.v_pubtopic.size();i++){
+		pub_topic << MyNodeInfo.v_pubtopic.at(i) << ", ";
+	}
+
+	ss << "Name:        " << MyNodeInfo.name << "\n"
+		 << "PID:         " << MyNodeInfo.pid << "\n" 
+		 << "Prio         " << MyNodeInfo.prio << "\n"
+		 << "Core:        " << MyNodeInfo.core << "\n"
+		 << "Runtime:     " << MyNodeInfo.runtime << "\n"
+		 << "Start Time:  " << MyNodeInfo.start_time << "\n"
+		 << "Finish Time: " << MyNodeInfo.start_time + MyNodeInfo.runtime << "\n"
+		 << "sub Topics:  " << sub_topic.str() << "\n"
+		 << "pub Topic:   " << pub_topic.str();
+
 	
-	
-	
-	qstr = QString::fromStdString(MyNodeInfo.name);
+	qstr = QString::fromStdString(ss.str());
 	TextBrowser->setText(qstr);
 }
 
@@ -58,7 +78,7 @@ void MySquare::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void MySquare::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    Pressed = false;
-    update();
-    QGraphicsItem::mouseReleaseEvent(event);
+  Pressed = false;
+  update();
+  QGraphicsItem::mouseReleaseEvent(event);
 }

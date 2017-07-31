@@ -17,12 +17,14 @@ typedef struct node_info_t {
 } node_info_t;
 
 typedef struct trace_info_t {
-    std::string name; //Currently this value indicates pid
+    std::string name; 
     std::vector<std::string> v_subtopic;
     std::vector<std::string> v_pubtopic;
+		unsigned int pid;
     int core;
     double runtime;
     double start_time;
+		int prio;
 
     bool operator<(const trace_info_t& another) const{
         return start_time < another.start_time;
@@ -34,12 +36,12 @@ class Tracer{
 public:
     Tracer();
     ~Tracer();
-    FILE *fp;
     void setup(std::string);
     void reset(std::string);
     void start_ftrace(std::string);
 
     std::vector<trace_info_t> get_info();
+		std::vector<node_info_t> get_node_list();
     std::vector<node_info_t> v_node_info_;
     std::vector<trace_info_t> v_trace_info;
 private:
@@ -47,7 +49,7 @@ private:
   Config config_;
 
   unsigned int get_pid(std::string name);
-    void mount(bool,std::string);
+  void mount(bool,std::string);
   void set_tracing_on(int mode, std::string);
   void set_trace(int mode, std::string);
   void set_events_enable(int mode, std::string);
@@ -55,14 +57,14 @@ private:
   void set_event(std::string, std::string);
   void output_log(std::string);
   void filter_pid(bool mode, std::string);
-    void extract_period();
-    void create_process_info(
-            std::vector<std::string> find_prev_pids,
-            std::vector<std::string> find_next_pids);
-    std::vector<std::string> split(std::string str, std::string delim);
-    std::string trim(const std::string& string);
-    int ctoi(std::string s);
-    };
+  void extract_period();
+  void create_process_info(
+			std::vector<std::string> find_prev_pids,
+			std::vector<std::string> find_next_pids);
+  std::vector<std::string> split(std::string str, std::string delim);
+  std::string trim(const std::string& string);
+	int ctoi(std::string s);
+};
 }
 
 #endif // TRACER_H

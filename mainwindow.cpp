@@ -20,58 +20,60 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow){
 
-    ui->setupUi(this);
+  ui->setupUi(this);
 
-    requirePass();
+  requirePass();
 
-    setWindowTitle(tr("ROSHC: TRACER"));
-    NodeGroup = createNodeGroup();
+  setWindowTitle(tr("ROSHC: TRACER"));
+  NodeGroup = createNodeGroup();
 
-    QVBoxLayout *toplayout = new QVBoxLayout;
-    toplayout->addWidget(createCPUGroup());
-    toplayout->addWidget(NodeGroup);
-    toplayout->addWidget(createTextBrowser());
-    toplayout->addWidget(createButtonGroup());
+  QVBoxLayout *toplayout = new QVBoxLayout;
+  toplayout->addWidget(createCPUGroup());
+  toplayout->addWidget(NodeGroup);
+  toplayout->addWidget(createTextBrowser());
+  toplayout->addWidget(createButtonGroup());
 
-    QWidget *window = new QWidget();
-    window->setLayout(toplayout);
+  QWidget *window = new QWidget();
+  window->setLayout(toplayout);
 
-    NodeGroup->hide();
-    setCentralWidget(window);
+  NodeGroup->hide();
+  setCentralWidget(window);
 }
 
 MainWindow::~MainWindow(){
-    delete ui;
+	delete ui;
 }
 
 void MainWindow::requirePass(){
-    passWindow = new QDialog;
-    QLabel *label = new QLabel("pass: ");
-    QLineEdit *edit = new QLineEdit;
-    QPushButton *button = new QPushButton("ok");
-    QHBoxLayout *layout = new QHBoxLayout;
+  passWindow = new QDialog;
+  QLabel *label = new QLabel("pass: ");
+  QLineEdit *edit = new QLineEdit;
+  QPushButton *button = new QPushButton("ok");
+  QHBoxLayout *layout = new QHBoxLayout;
 
-    QObject::connect(edit, SIGNAL(textChanged(const QString &)),this, SLOT(setPass(const QString &)));
-    QObject::connect(button,SIGNAL(clicked()),this,SLOT(onSetPass()));
+  QObject::connect(edit, SIGNAL(textChanged(const QString &)),
+			this, SLOT(setPass(const QString &)));
+  QObject::connect(button,SIGNAL(clicked()),
+			this,SLOT(onSetPass()));
 
-    layout->addWidget(label);
-    layout->addWidget(edit);
-    layout->addWidget(button);
-    passWindow->setWindowTitle("Password");
-    passWindow->setLayout(layout);
+  layout->addWidget(label);
+  layout->addWidget(edit);
+  layout->addWidget(button);
+  passWindow->setWindowTitle("Password");
+  passWindow->setLayout(layout);
 
 
-    passWindow->show();
+  passWindow->show();
 }
 
 void MainWindow::setPass(const QString &input){
-    if(input!=pass){
-        pass = input;
-    }
+  if(input!=pass){
+    pass = input;
+  }
 }
 
 void MainWindow::onSetPass(){
-    passWindow->hide();
+  passWindow->hide();
 }
 
 QGroupBox *MainWindow::createCPUGroup(){
@@ -105,13 +107,6 @@ QGroupBox *MainWindow::createCPUGroup(){
     QBrush blueBrush(Qt::blue);
     QPen blackpen(Qt::black);
     blackpen.setWidth(1);
-#if 0
-    // temp
-    square = new MySquare(0,0,50);
-    scene->addItem(square);
-    square1 = new MySquare(10,100,50);
-    scene->addItem(square1);
-#endif
 
     view = new QGraphicsView(scene);
     toplayout->addWidget(view);
@@ -120,17 +115,24 @@ QGroupBox *MainWindow::createCPUGroup(){
     return groupBox;
 }
 
-// push_back
 QGroupBox *MainWindow::createNodeGroup(){
     QGroupBox *groupBox = new QGroupBox("Node");
-    QLabel *node0 = new QLabel("talker");
-    QLabel *node1 = new QLabel("listener");
+		SchedViz::Tracer tracer;
+		std::vector<node_info_t> node_list;
+		std::string node_name_;
+		QLabel *name_label;
+		
+		node_list = tracer.get_node_list();
     QVBoxLayout *layout = new QVBoxLayout;
 
-    layout->addWidget(node0);
-    layout->addWidget(node1);
-    layout->addStretch(1);
-    groupBox->setLayout(layout);
+		for(int i(0); i<(int)node_list.size();i++){
+			node_name_ = node_list[i].name.c_str();
+			name_label = new QLabel(node_name_.c_str());
+			label_list.push_back(name_label);			
+			layout->addWidget(label_list[i]);
+		}
+
+		groupBox->setLayout(layout);
 
     return groupBox;
 }
@@ -164,9 +166,12 @@ QGroupBox *MainWindow::createButtonGroup(){
     StartStopButton->setCheckable(true);
     NodeListButton->setCheckable(true);
 
-    QObject::connect(StartStopButton, SIGNAL(toggled(bool)), this, SLOT(StartStopTrace(bool)));
-    QObject::connect(NodeListButton, SIGNAL(toggled(bool)), this, SLOT(ShowNodes(bool)));
-    QObject::connect(CloseButton, SIGNAL(clicked()), this, SLOT(quit()));
+    QObject::connect(StartStopButton, SIGNAL(toggled(bool)),
+				this, SLOT(StartStopTrace(bool)));
+    QObject::connect(NodeListButton, SIGNAL(toggled(bool)),
+				this, SLOT(ShowNodes(bool)));
+    QObject::connect(CloseButton, SIGNAL(clicked()),
+				this, SLOT(quit()));
 
     return groupBox;
 }
@@ -189,7 +194,7 @@ void MainWindow::ShowNodes(bool click){
       NodeGroup->show();
     }
     else{
-        NodeGroup->hide();
+      NodeGroup->hide();
     }
 }
 
@@ -202,13 +207,13 @@ void MainWindow::viz_process(std::vector<trace_info_t> info){
   double x=0;
   double y=0;
 
+
   for(int i=0;i<(int)info.size();i++){
     x = info[i].start_time - base_time;
     width = info[i].runtime;
     y = info[i].core * base_y;
 
     square = new MySquare(x*ZOOM+base_x,y,width*ZOOM,info[i],browser);
-
     process_info.push_back(square); 
     scene->addItem(process_info[i]);		
   }

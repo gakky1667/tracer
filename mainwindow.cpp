@@ -130,6 +130,7 @@ QGroupBox *MainWindow::createNodeGroup(){
 			name_label = new QLabel(node_name_.c_str());
 			label_list.push_back(name_label);			
 			layout->addWidget(label_list[i]);
+			pid_list.push_back(node_list[i].pid); 
 		}
 
 		groupBox->setLayout(layout);
@@ -213,10 +214,28 @@ void MainWindow::viz_process(std::vector<trace_info_t> info){
     width = info[i].runtime;
     y = info[i].core * base_y;
 
-    square = new MySquare(x*ZOOM+base_x,y,width*ZOOM,info[i],browser);
-    process_info.push_back(square); 
+    square = new MySquare(
+				x*ZOOM+base_x,
+				y,
+				width*ZOOM,
+				info[i],
+				browser,
+				get_color(info[i].pid)
+				);
+    
+		process_info.push_back(square); 
     scene->addItem(process_info[i]);		
   }
+}
+
+QColor MainWindow::get_color(int pid){
+	QColor color;
+
+	for(int i(0); i<(int)label_list.size();i++){
+	  if(pid == pid_list[i])
+			color = colors[i];
+	}
+	return color;
 }
 
 void MainWindow::quit(){

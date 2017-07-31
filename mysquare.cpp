@@ -2,7 +2,7 @@
 #include "mainwindow.h"
 #include <QTextBrowser>
 
-MySquare::MySquare(int my_x, int my_y,int my_width, trace_info_t my_node_info, QTextBrowser *browser)
+MySquare::MySquare(int my_x, int my_y,int my_width, trace_info_t my_node_info, QTextBrowser *browser, QColor my_color)
 {
     Pressed = false;
     setFlag(ItemIsSelectable);
@@ -11,6 +11,7 @@ MySquare::MySquare(int my_x, int my_y,int my_width, trace_info_t my_node_info, Q
     MyWidth = my_width;
 		MyNodeInfo = my_node_info;
 		TextBrowser = browser;
+		MyColor = my_color;
 }
 
 QRectF MySquare::boundingRect() const
@@ -22,21 +23,22 @@ QRectF MySquare::boundingRect() const
 
 void MySquare::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    QRectF rec = boundingRect();
-    QBrush brush(Qt::blue); //default color
-    QPen blackpen(Qt::black);
-    blackpen.setWidth(6);
+  QRectF rec = boundingRect();
+  QBrush brush(Qt::blue); //default color
+  QPen blackpen(Qt::black);
+  blackpen.setWidth(6);
 
-    if (Pressed){
-        brush.setColor(Qt::red);
-				show_node_info();
-    }else{
-        brush.setColor(Qt::green); // TODO: Color-coded for each node
-    }
+  if (Pressed){
+    brush.setColor(Qt::red);
+    show_node_info();
+  }else{
+    brush.setColor(MyColor); 
+  }
 
-    painter->fillRect(rec,brush);
-    painter->drawRect(rec);
+  painter->fillRect(rec,brush);
+  painter->drawRect(rec);
 }
+
 
 void MySquare::show_node_info()
 {

@@ -47,11 +47,15 @@ private:
     QGraphicsScene *scene;
     MySquare *square;
 		QTextBrowser *browser;
+		std::vector<int> pid_list;
 
     QGroupBox *createCPUGroup();
     QGroupBox *createNodeGroup();
     QGroupBox *createTextBrowser();
     QGroupBox *createButtonGroup();
+
+		QColor get_color(int pid);
+		QColor colors[6] = {Qt::red, Qt::blue, Qt::green, Qt::yellow, Qt::magenta, Qt::cyan};
 
 public slots:
     void StartStopTrace(bool click);//View1に対してのslot関数

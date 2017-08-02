@@ -54,15 +54,15 @@ void MySquare::show_node_info()
 		pub_topic << MyNodeInfo.v_pubtopic.at(i) << ", ";
 	}
 
-	ss << "Name:        " << MyNodeInfo.name << "\n"
-		 << "PID:         " << MyNodeInfo.pid << "\n" 
-		 << "Prio         " << MyNodeInfo.prio << "\n"
-		 << "Core:        " << MyNodeInfo.core << "\n"
-		 << "Runtime:     " << MyNodeInfo.runtime << "\n"
-		 << "Start Time:  " << MyNodeInfo.start_time << "\n"
+	ss << "Name: " << MyNodeInfo.name << "\n"
+		 << "PID: " << MyNodeInfo.pid << "\n" 
+		 << "Prio " << MyNodeInfo.prio << "\n"
+		 << "Core: " << MyNodeInfo.core << "\n"
+		 << "Runtime: " << MyNodeInfo.runtime << "\n"
+		 << "Start Time: " << MyNodeInfo.start_time << "\n"
 		 << "Finish Time: " << MyNodeInfo.start_time + MyNodeInfo.runtime << "\n"
-		 << "sub Topics:  " << sub_topic.str() << "\n"
-		 << "pub Topic:   " << pub_topic.str();
+		 << "sub Topics: " << sub_topic.str() << "\n"
+		 << "pub Topic: " << pub_topic.str();
 
 	
 	qstr = QString::fromStdString(ss.str());

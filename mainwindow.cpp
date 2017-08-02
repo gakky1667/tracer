@@ -195,10 +195,22 @@ QGroupBox *MainWindow::createButtonGroup(){
 void MainWindow::StartStopTrace(bool click){
 
   if (click){
+
+    /* Preparation for second and subsequent procesing */
+		if(process_info.size() != 0){
+      for(int i(0); i< (int)process_info.size();i++){
+        delete process_info[i];
+			}
+	    process_info.resize(0);
+		}
+
+    /* Start tracing */
     SchedViz::Tracer tracer;
     tracer.setup(pass.toStdString());
     tracer.start_ftrace(pass.toStdString());
   }else{
+
+		/* Get trace infomation */
 		int zoom = 1;
     SchedViz::Tracer tracer;
     tracer.reset(pass.toStdString());

@@ -24,9 +24,8 @@ QRectF MySquare::boundingRect() const
 void MySquare::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
   QRectF rec = boundingRect();
-  QBrush brush(Qt::blue); //default color
-  QPen blackpen(Qt::black);
-  blackpen.setWidth(6);
+  QBrush brush(Qt::black); //default color
+	painter->setPen(Qt::black);
 
   if (Pressed){
     brush.setColor(Qt::red);

@@ -1,27 +1,24 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QMessageBox>
+#include "tracer.h"
+#include "mysquare.h"
 #include <QTextBrowser>
 #include <QDialog>
-#include <QCheckBox>
-#include "tracer.h"
-#include <QGraphicsTextItem>
-#include <QGraphicsItem>
 #include <QGroupBox>
-#include <QMessageBox>
-#include <QTextEdit>
 #include <string>
 #include <QtCore/QString>
 #include <QBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
-#include "mysquare.h"
+#include <QColor>
 
+#define CORE 8
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow){
 
   ui->setupUi(this);
 
+  setGeometry(0,0,800,500);
   requirePass();
 
   setWindowTitle(tr("ROSHC: TRACER"));
@@ -92,23 +89,22 @@ QGroupBox *MainWindow::createCPUGroup(){
 	QLabel *cpu7 = new QLabel("cpu 7");
   QVBoxLayout *layout = new QVBoxLayout;
 
-  layout->addWidget(cpu0); layout->addStretch();
-  layout->addWidget(cpu1); layout->addStretch();
-  layout->addWidget(cpu2); layout->addStretch();
-  layout->addWidget(cpu3); layout->addStretch();
-  layout->addWidget(cpu4); layout->addStretch();
-  layout->addWidget(cpu5); layout->addStretch();
-  layout->addWidget(cpu6); layout->addStretch();
-  layout->addWidget(cpu7); layout->addStretch();
+
+	layout->setSpacing(20);
+	layout->addSpacing(10);
+  layout->addWidget(cpu0); 
+  layout->addWidget(cpu1);
+  layout->addWidget(cpu2);
+  layout->addWidget(cpu3); 
+  layout->addWidget(cpu4); 
+  layout->addWidget(cpu5);
+  layout->addWidget(cpu6); 
+  layout->addWidget(cpu7); 
+	layout->addSpacing(20);
   graph->addLayout(layout);
 
   scene = new QGraphicsScene(this);
   ui->graphicsView->setScene(scene);
-
-  QBrush redBrush(Qt::red);
-  QBrush blueBrush(Qt::blue);
-  QPen blackpen(Qt::black);
-  blackpen.setWidth(1);
 
   view = new QGraphicsView(scene);
   graph->addWidget(view);
@@ -118,6 +114,7 @@ QGroupBox *MainWindow::createCPUGroup(){
   QPushButton *ZoomIn = new QPushButton("Zoom In");
   buttons->addWidget(ZoomOut);
   buttons->addWidget(ZoomIn);
+	buttons->addStretch();
 
   QObject::connect(ZoomOut, SIGNAL(clicked()),
 				this, SLOT(zoom_out_process()));
@@ -127,70 +124,72 @@ QGroupBox *MainWindow::createCPUGroup(){
 
   toplayout->addLayout(graph);
   toplayout->addLayout(buttons);
+	toplayout->addStretch();
   groupBox->setLayout(toplayout);
 
   return groupBox;
 }
 
 QGroupBox *MainWindow::createNodeGroup(){
-    QGroupBox *groupBox = new QGroupBox("Node");
-		SchedViz::Tracer tracer;
-		std::vector<node_info_t> node_list;
-		std::string node_name_;
-		QLabel *name_label;
+  QGroupBox *groupBox = new QGroupBox("Node");
+  SchedViz::Tracer tracer;
+  std::vector<node_info_t> node_list;
+  std::string node_name_;
+  QLabel *name_label;
 		
-		node_list = tracer.get_node_list();
-    QVBoxLayout *layout = new QVBoxLayout;
+  node_list = tracer.get_node_list();
+  QVBoxLayout *layout = new QVBoxLayout;
 
-		for(int i(0); i<(int)node_list.size();i++){
-			node_name_ = node_list[i].name.c_str();
-			name_label = new QLabel(node_name_.c_str());
-			label_list.push_back(name_label);			
-			layout->addWidget(label_list[i]);
-			pid_list.push_back(node_list[i].pid); 
-		}
+  for(int i(0); i<(int)node_list.size();i++){
+    node_name_ = node_list[i].name.c_str();
+    name_label = new QLabel(node_name_.c_str());
+    label_list.push_back(name_label);			
+    layout->addWidget(label_list[i]);
+    pid_list.push_back(node_list[i].pid); 
+  }
 
-		groupBox->setLayout(layout);
+  groupBox->setLayout(layout);
 
-    return groupBox;
+  return groupBox;
 }
 
 QGroupBox *MainWindow::createTextBrowser(){
-    QGroupBox *groupBox = new QGroupBox("Node Info");
-    browser = new QTextBrowser;
-    QVBoxLayout *layout = new QVBoxLayout;
+  QGroupBox *groupBox = new QGroupBox("Node Info");
+  browser = new QTextBrowser;
+  QVBoxLayout *layout = new QVBoxLayout;
 
-    layout->addWidget(browser);
-    browser->setText("Here, Node's informations are shown \n(e.g, PID, prio,...)");
-    groupBox->setLayout(layout);
+  layout->addWidget(browser);
+  browser->setText("Here, Node's informations are shown \n(e.g, PID, prio,...)");
+  layout->addStretch();
+  groupBox->setLayout(layout);
 
-    return groupBox;
+  return groupBox;
 }
 
 QGroupBox *MainWindow::createButtonGroup(){
-    QGroupBox *groupBox = new QGroupBox("Operations");
-    QPushButton *StartStopButton = new QPushButton("Start/Stop");
-    QPushButton *NodeListButton = new QPushButton("Node List View");
-    QPushButton *CloseButton = new QPushButton("Close");
-    QHBoxLayout *layout = new QHBoxLayout;
+  QGroupBox *groupBox = new QGroupBox("Operations");
+  QPushButton *StartStopButton = new QPushButton("Start / Stop");
+  QPushButton *NodeListButton = new QPushButton("View Node List");
+  QPushButton *CloseButton = new QPushButton("Close");
+  QHBoxLayout *layout = new QHBoxLayout;
 
-    layout->addWidget(StartStopButton);
-    layout->addWidget(NodeListButton);
-    layout->addWidget(CloseButton);
-    layout->addStretch(1);
-    groupBox->setLayout(layout);
+  layout->addWidget(StartStopButton);
+  layout->addWidget(NodeListButton);
+  layout->addWidget(CloseButton);
+  layout->addStretch(1);
+  groupBox->setLayout(layout);
 
-    StartStopButton->setCheckable(true);
-    NodeListButton->setCheckable(true);
+  StartStopButton->setCheckable(true);
+  NodeListButton->setCheckable(true);
 
-    QObject::connect(StartStopButton, SIGNAL(toggled(bool)),
-				this, SLOT(StartStopTrace(bool)));
-    QObject::connect(NodeListButton, SIGNAL(toggled(bool)),
-				this, SLOT(ShowNodes(bool)));
-    QObject::connect(CloseButton, SIGNAL(clicked()),
-				this, SLOT(quit()));
+  QObject::connect(StartStopButton, SIGNAL(toggled(bool)),
+			this, SLOT(StartStopTrace(bool)));
+	QObject::connect(NodeListButton, SIGNAL(toggled(bool)),
+			this, SLOT(ShowNodes(bool)));
+	QObject::connect(CloseButton, SIGNAL(clicked()),
+			this, SLOT(quit()));
 
-    return groupBox;
+  return groupBox;
 }
 
 void MainWindow::StartStopTrace(bool click){
@@ -210,32 +209,44 @@ void MainWindow::StartStopTrace(bool click){
 
 void MainWindow::ShowNodes(bool click){
 
-    if(click){
-      NodeGroup->show();
-    }
-    else{
-      NodeGroup->hide();
-    }
+  if(click){
+    NodeGroup->show();
+  }
+  else{
+    NodeGroup->hide();
+  }
 }
 
 
 void MainWindow::viz_process(std::vector<trace_info_t> info, double zoom){
   double base_time = info[0].start_time;
-  double base_x = 200;
-  double base_y = 40;
+  double base_x = -50;
+  double base_y = 12;
+	double space = 38;
   double width =0;
   double x=0;
   double y=0;
-	
 	ZOOM += zoom;
 
 
-  for(int i=0;i<(int)info.size();i++){
+	/* Initialize geometry
+	 * y = upper of QGraphicsScene 
+	 * */
+	scene->addRect(0, 0, 1, 10, QPen(Qt::white), QBrush(Qt::white));
+	
+	/* Initialize geometry
+	 * y = bottom of QGraphicsScene 
+	 * */
+	scene->addRect(0, 7*39, 1, 10, QPen(Qt::white), QBrush(Qt::white));
+
+
+	/* plot node */
+  for(int i(0);i<(int)info.size();i++){
     x = info[i].start_time - base_time;
     width = info[i].runtime;
-    y = info[i].core * base_y;
+    y = base_y + (info[i].core * space);
 
-    square = new MySquare(
+		square = new MySquare(
 				x*ZOOM+base_x,
 				y,
 				width*ZOOM,
@@ -245,7 +256,7 @@ void MainWindow::viz_process(std::vector<trace_info_t> info, double zoom){
 				);
     
 		process_info.push_back(square); 
-    scene->addItem(process_info[i]);		
+    scene->addItem(process_info[i]);
   }
 }
 
@@ -280,7 +291,6 @@ void MainWindow::zoom_out_process(){
 		viz_process(info,0);
 	else
 		viz_process(info,-500);
-
 }
 
 void MainWindow::quit(){

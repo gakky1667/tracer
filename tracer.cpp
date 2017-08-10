@@ -95,6 +95,7 @@ void Tracer::reset(std::string userPass){
 void Tracer::mount(bool mode, std::string userPass){
   std::string first_com = "echo ";
   std::string second_com;
+	int ret = 0;
 
   switch (mode){
     case true:
@@ -106,13 +107,21 @@ void Tracer::mount(bool mode, std::string userPass){
   }
 
   first_com += (userPass + second_com);
-  system(first_com.c_str());
+  ret = system(first_com.c_str());
+	
+	if(ret != 0){
+		std::cout << "mount error" << std::endl;
+    std::cout << "may be password is incorrect" << std::endl;
+		std::cout << "exit" << std::endl;
+		exit(1);
+	}
 
 }
 
 void Tracer::set_tracing_on(int mode, std::string userPass){
   std::string first_com = "echo ";
   std::string second_com;
+	int ret = 0;
 
   switch (mode){
     case 0:
@@ -124,12 +133,22 @@ void Tracer::set_tracing_on(int mode, std::string userPass){
     default:
       break;
   }
-  system(first_com.c_str());
+  
+	ret = system(first_com.c_str());
+	
+	if(ret != 0){
+		std::cout << "error: set_tracing_on" << std::endl;
+    std::cout << "may be password is incorrect" << std::endl;
+		std::cout << "exit" << std::endl;
+		exit(1);
+	}
+
 }
 
 void Tracer::set_trace(int mode, std::string userPass){
   std::string first_com = "echo ";
   std::string second_com;
+	int ret = 0;
 
   switch (mode){
     case 0:
@@ -141,12 +160,22 @@ void Tracer::set_trace(int mode, std::string userPass){
     default:
       break;
   }
-  system(first_com.c_str());
+	
+  ret = system(first_com.c_str());
+
+	if(ret != 0){
+		std::cout << "error: set_trace" << std::endl;
+    std::cout << "may be password is incorrect" << std::endl;
+		std::cout << "exit" << std::endl;
+		exit(1);
+	}
+
 }
 
 void Tracer::set_events_enable(int mode, std::string userPass){
   std::string first_com = "echo ";
   std::string second_com;
+	int ret = 0;
 
   switch (mode){
     case 0:
@@ -158,41 +187,86 @@ void Tracer::set_events_enable(int mode, std::string userPass){
     default:
       break;
   }
-  system(first_com.c_str());
+  
+	ret = system(first_com.c_str());
+	
+	if(ret != 0){
+		std::cout << "error: set_events_enable" << std::endl;
+    std::cout << "may be password is incorrect" << std::endl;
+		std::cout << "exit" << std::endl;
+		exit(1);
+	}
+	
 }
 
 void Tracer::set_current_tracer(std::string mode, std::string userPass){
+	int ret = 0;
   std::string first_com = "echo ";
   std::string second_com = " | sudo -S sh -c \"echo \'";
   std::string third_com = "\' > /sys/kernel/debug/tracing/current_tracer\"";
 
   first_com += (userPass + second_com + mode + third_com);
 
-  system(first_com.c_str());
+  ret = system(first_com.c_str());
+		
+	if(ret != 0){
+		std::cout << "error: set_current_tracer" << std::endl;
+    std::cout << "may be password is incorrect" << std::endl;
+		std::cout << "exit" << std::endl;
+		exit(1);
+	}
+
+		
 }
 
 void Tracer::set_event(std::string mode, std::string userPass){
+	int ret = 0;
   std::string first_com = "echo ";
   std::string second_com = " | sudo -S sh -c \"echo \'";
   std::string third_com = "\' > /sys/kernel/debug/tracing/set_event\"";
 
   first_com += (userPass + second_com + mode + third_com);
-  system(first_com.c_str());
+  ret = system(first_com.c_str());
+			
+	if(ret != 0){
+		std::cout << "error: set_event" << std::endl;
+    std::cout << "may be password is incorrect" << std::endl;
+		std::cout << "exit" << std::endl;
+		exit(1);
+	}
 
 }
 
 void Tracer::start_ftrace(std::string userPass){
+	int ret = 0;
   std::string start_com = "echo ";
   std::string second_com = "| sudo -S sh -c \"echo \'1\' > /sys/kernel/debug/tracing/tracing_on\"";
   start_com += (userPass + second_com);
-  system(start_com.c_str());
+  ret = system(start_com.c_str());
+			
+	if(ret != 0){
+		std::cout << "error: start_ftrace" << std::endl;
+    std::cout << "may be password is incorrect" << std::endl;
+		std::cout << "exit" << std::endl;
+		exit(1);
+	}
+
 }
 
 void Tracer::output_log(std::string userPass){
-  std::string first_com = "echo ";
+  int ret = 0;
+	std::string first_com = "echo ";
   std::string second_com = "| sudo -S sh -c \"cat /sys/kernel/debug/tracing/trace > ./ftrace.log\"";
   first_com += userPass + second_com;
-  system(first_com.c_str());
+  ret = system(first_com.c_str());
+			
+	if(ret != 0){
+		std::cout << "error: output_log" << std::endl;
+    std::cout << "may be password is incorrect" << std::endl;
+		std::cout << "exit" << std::endl;
+		exit(1);
+	}
+
 }
 
 void Tracer::filter_pid(bool mode, std::string userPass){
@@ -200,15 +274,24 @@ void Tracer::filter_pid(bool mode, std::string userPass){
   std::string second_com = " | sudo -S sh -c \"echo \'";
   std::string third_com = "\' > /sys/kernel/debug/tracing/set_ftrace_pid\"";
   std::ostringstream pids;
+	int ret = 0;
 
   // Initialize pids
   pids.str(""); 
   pids.clear(std::stringstream::goodbit);
   first_com += (userPass + second_com);
   first_com += (pids.str() + third_com);
-  system(first_com.c_str());
+  ret = system(first_com.c_str());
 
-	
+			
+	if(ret != 0){
+		std::cout << "error: filter_pid" << std::endl;
+    std::cout << "may be password is incorrect" << std::endl;
+		std::cout << "exit" << std::endl;
+		exit(1);
+	}
+
+
   if(mode == true){
     first_com = "echo ";
    		
@@ -221,13 +304,27 @@ void Tracer::filter_pid(bool mode, std::string userPass){
       pids.str("");
       pids.clear(std::stringstream::goodbit);
 
-      system(first_com.c_str());
+      ret = system(first_com.c_str());
+			
+			if(ret != 0){
+				std::cout << "error: filter_pid" << std::endl;
+				std::cout << "may be password is incorrect" << std::endl;
+				std::cout << "exit" << std::endl;
+				exit(1);
+			}
+
       first_com = "echo ";
     }
 
   }else{
-    system(first_com.c_str());
-  }
+    ret = system(first_com.c_str());
+		if(ret != 0){
+			std::cout << "error: filter_pid" << std::endl;
+			std::cout << "may be password is incorrect" << std::endl;
+			std::cout << "exit" << std::endl;
+			exit(1);
+		}
+	}
 }
 
 
@@ -276,11 +373,19 @@ void Tracer::create_process_info(
     while(std::getline(_trace_log,buf)){
 
       // start time
-      if(buf.find(find_next_pid.at(i)) != -1){
+      if(buf.find(find_next_pid.at(i)) != std::string::npos){
 			  start_time_s = split(trim(buf),delim);
-				trace_info.prio = stoi(start_time_s[12].substr(10)); //index of array is 11 or 12
+#ifdef CORE_DUMP
+				trace_info.prio = stoi(start_time_s[11].substr(10)); //index of array is 11 or 12
+#else
+        trace_info.prio = stoi(start_time_s[12].substr(10)); //index of array is 11 or 12
+#endif
 				start_time_s = split(trim(buf),delim);
-        start_time_i = strtod(start_time_s[3].c_str(),NULL); //index of array is 2 or 3
+#ifdef CORE_DUMP
+        start_time_i = strtod(start_time_s[2].c_str(),NULL); //index of array is 2 or 3
+#else
+				start_time_i = strtod(start_time_s[3].c_str(),NULL); //index of array is 2 or 3
+#endif
         trace_info.name = find_next_pid.at(i).substr(9); //pid
         trace_info.pid = std::stoi(find_next_pid.at(i).substr(9)); //pid
 				trace_info.start_time = start_time_i;
@@ -296,9 +401,13 @@ void Tracer::create_process_info(
       }
 
       // end time
-      if(buf.find(find_prev_pid.at(i)) != -1){
+      if(buf.find(find_prev_pid.at(i)) != std::string::npos){
         finish_time_s = split(trim(buf),delim);
-        finish_time_i = strtod(finish_time_s[3].c_str(),NULL); //index of array is 2 or 3
+#ifdef CORE_DUMP
+        finish_time_i = strtod(finish_time_s[2].c_str(),NULL); //index of array is 2 or 3
+#else
+				finish_time_i = strtod(finish_time_s[3].c_str(),NULL); //index of array is 2 or 3
+#endif
         trace_info.runtime = finish_time_i - start_time_i;
         v_trace_info.push_back(trace_info);
       }

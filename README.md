@@ -19,3 +19,7 @@ Required ROS node information:
  * `nodename`: the name of ROS node
  * `sub_topic`: topic for subscribe (Not compulsory)
  * `pub_topic`: topic for publish  (Not compulsory)
+
+## 3. If core dump occurs
+
+Please comment out or uncomment `#DEFINE CORE_DUMP` in tracer.h.

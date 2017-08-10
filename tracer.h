@@ -9,6 +9,9 @@
 #include <iostream>
 #include <sstream>
 
+/* If core dump occurs, try comment out or uncomment */
+#define CORE_DUMP
+
 typedef struct node_info_t {
   std::string name;
   unsigned int pid;

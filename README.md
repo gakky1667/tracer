@@ -11,7 +11,7 @@ $ make
 
 ## 2. How to use
 
-Please list the nodes you want to trace.
+Please list the nodes you want to trace on the node_graph.yaml.
 After that, please run Tracer, and GUI is launched.
 
 Required ROS node information:

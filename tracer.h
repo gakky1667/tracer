@@ -15,6 +15,7 @@
 typedef struct node_info_t {
   std::string name;
   unsigned int pid;
+	double deadline;
   std::vector<std::string> v_subtopic;
   std::vector<std::string> v_pubtopic;
 } node_info_t;
@@ -28,6 +29,7 @@ typedef struct trace_info_t {
     double runtime;
     double start_time;
 		int prio;
+		double deadline;
 
     bool operator<(const trace_info_t& another) const{
         return start_time < another.start_time;

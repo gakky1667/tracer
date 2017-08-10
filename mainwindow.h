@@ -48,7 +48,10 @@ private:
 		std::vector<QLabel*> label_list;
 		std::vector<QLabel*> Node_list;
 		std::vector<node_info_t> node_list;
-    QGraphicsView *CPU_view;
+		std::vector<QGraphicsLineItem*> deadline_miss_list;
+		QGraphicsLineItem *deadline_miss;
+    
+		QGraphicsView *CPU_view;
     QGraphicsScene *CPU_scene;
 		QGraphicsView *Node_view;
 		QGraphicsScene *Node_scene;

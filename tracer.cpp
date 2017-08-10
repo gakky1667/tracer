@@ -31,6 +31,7 @@ void Tracer::load_config_(const std::string &filename) {
       const YAML::Node node_name = node_list[i]["nodename"];
       const YAML::Node node_subtopic = node_list[i]["sub_topic"];
       const YAML::Node node_pubtopic = node_list[i]["pub_topic"];
+			const YAML::Node node_deadline = node_list[i]["deadline"];
 
       node_info_t node_info;
       node_info.name = node_name.as<std::string>();
@@ -45,6 +46,7 @@ void Tracer::load_config_(const std::string &filename) {
         node_info.v_pubtopic.push_back(node_pubtopic[j].as<std::string>());
       }
 
+			node_info.deadline = node_deadline.as<double>();
       node_info.pid = get_pid(node_info.name);
       v_node_info_.push_back(node_info);
     }
@@ -396,6 +398,7 @@ void Tracer::create_process_info(
 					  trace_info.name = v_node_info_.at(i).name;
 						trace_info.v_subtopic = v_node_info_.at(i).v_subtopic;
 						trace_info.v_pubtopic = v_node_info_.at(i).v_pubtopic; 
+					  trace_info.deadline = v_node_info_.at(i).deadline;
 					}
 				}
       }
@@ -415,7 +418,7 @@ void Tracer::create_process_info(
   }
 
   //sort by start_time
-  std::sort(v_trace_info.begin(),v_trace_info.end());
+  //std::sort(v_trace_info.begin(),v_trace_info.end());
 
 #ifdef PRINT_DEBUG
   for(int i=0;i<(int)v_trace_info.size();i++){

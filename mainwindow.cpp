@@ -167,6 +167,7 @@ QGroupBox *MainWindow::createNodeGroup(){
 
 	/* create view */
   Node_view = new QGraphicsView(Node_scene);
+	Node_view->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
   graph->addWidget(Node_view);
 
 	/* create buttons */
@@ -326,6 +327,7 @@ void MainWindow::viz_process(std::vector<trace_info_t> info, double zoom){
   double width =0;
   double x=0;
   double y=0;
+	int k=0;
 	QGraphicsScene *scene;
 	ZOOM += zoom;
 
@@ -366,16 +368,43 @@ void MainWindow::viz_process(std::vector<trace_info_t> info, double zoom){
   for(int i(0);i<(int)info.size();i++){
     x = info[i].start_time - base_time;
     width = info[i].runtime;
+	
 		switch (mode){
 			case CPU_MODE:
         y = base_y + (info[i].core * space);
 				break;
 			case NODE_MODE:
+				double finish_time;
+				double finish_time_prev;
+
+
+
+				/* Classify nodes */
 				for(int j(0); j < (int)node_list.size(); j++){
 				  if (info[i].name == node_list[j].name)
 					  y = base_y + ( j * space);
 				}
+
+				/* analyze deadline miss */
+				finish_time = info[i].start_time + info[i].runtime;
+				finish_time_prev =  info[i-1].start_time + info[i-1].runtime;
+
+				if(i!=0 && finish_time - finish_time_prev > info[i].deadline){
+					
+					deadline_miss = new QGraphicsLineItem();
+					deadline_miss->setLine(
+							x*ZOOM+base_x+info[i].runtime,
+							y,
+							x*ZOOM+base_x+info[i].runtime,
+							y-10); /* length of line */
+
+					deadline_miss->setPen(QPen(Qt::red));
+					deadline_miss_list.push_back(deadline_miss);
+					scene->addItem(deadline_miss_list[k]);
+					k++;
+				}
 				break;
+
 			default:
 				y = base_y;
 		}
@@ -388,7 +417,7 @@ void MainWindow::viz_process(std::vector<trace_info_t> info, double zoom){
 				browser,
 				get_color(info[i].pid)
 				);
-    
+		
 		process_info.push_back(square); 
     scene->addItem(process_info[i]);
   }
@@ -423,11 +452,16 @@ void MainWindow::zoom_out_process(){
 
 void MainWindow::delete_viz_process(){
 
-	for(int i(0); i< (int)process_info.size();i++){
+	for(int i(0); i < (int)process_info.size();i++){
 		delete process_info[i];
 	}
-
 	process_info.resize(0);
+
+  for(int i(0); i < (int)deadline_miss_list.size();i++){
+		delete deadline_miss_list[i];
+	}
+
+	deadline_miss_list.resize(0);
 }
 
 void MainWindow::quit(){

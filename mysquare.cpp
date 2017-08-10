@@ -59,7 +59,7 @@ void MySquare::show_node_info()
 		 << "Prio " << MyNodeInfo.prio << "\n"
 		 << "Core: " << MyNodeInfo.core << "\n"
 		 << "Runtime: " << MyNodeInfo.runtime << "\n"
-		 << "Start Time: " << MyNodeInfo.start_time << "\n"
+		 << "Start Time: " << std::fixed << MyNodeInfo.start_time << "\n"
 		 << "Finish Time: " << MyNodeInfo.start_time + MyNodeInfo.runtime << "\n"
 		 << "sub Topics: " << sub_topic.str() << "\n"
 		 << "pub Topic: " << pub_topic.str();

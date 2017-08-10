@@ -24,40 +24,54 @@ class MainWindow;
 
 class MainWindow : public QMainWindow
 {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+  explicit MainWindow(QWidget *parent = 0);
+  ~MainWindow();
 
-    QGroupBox *NodeGroup;
-    QDialog *passWindow;
+	QGroupBox *CPUGroup;
+	QGroupBox *NodeGroup;
+  QGroupBox *NodeListGroup;
+  QDialog *passWindow;
+  void requirePass();
+	int mode; // CPU_MODE or NODE_MODE
 
 private:
     Ui::MainWindow *ui;
 
     void viz_process(std::vector<trace_info_t> info, double zoom);
-    void requirePass();
-
+    
     QString pass;
 
 		std::vector<MySquare*> process_info;
 		std::vector<QLabel*> label_list;
-    QGraphicsView *view;
-    QGraphicsScene *scene;
+		std::vector<QLabel*> Node_list;
+		std::vector<node_info_t> node_list;
+    QGraphicsView *CPU_view;
+    QGraphicsScene *CPU_scene;
+		QGraphicsView *Node_view;
+		QGraphicsScene *Node_scene;
     MySquare *square;
 		QTextBrowser *browser;
 		std::vector<int> pid_list;
+
 		std::vector<trace_info_t> info;
 		double ZOOM;
 
     QGroupBox *createCPUGroup();
-    QGroupBox *createNodeGroup();
+		QGroupBox *createNodeGroup();
+    QGroupBox *createNodeListGroup();
     QGroupBox *createTextBrowser();
     QGroupBox *createButtonGroup();
 
 		QColor get_color(int pid);
 		QColor colors[6] = {Qt::red, Qt::blue, Qt::green, Qt::yellow, Qt::magenta, Qt::cyan};
+		void delete_viz_process();
+
+#define CPU_MODE 1
+#define NODE_MODE 2
+
 
 public slots:
     void StartStopTrace(bool click);
@@ -67,5 +81,6 @@ public slots:
     void onSetPass();
 		void zoom_out_process();
 		void zoom_in_process();
+		void changeCPUNode(bool click);
 
 };

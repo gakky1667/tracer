@@ -278,9 +278,9 @@ void Tracer::create_process_info(
       // start time
       if(buf.find(find_next_pid.at(i)) != -1){
 			  start_time_s = split(trim(buf),delim);
-				trace_info.prio = stoi(start_time_s[11].substr(10));
+				trace_info.prio = stoi(start_time_s[12].substr(10)); //index of array is 11 or 12
 				start_time_s = split(trim(buf),delim);
-        start_time_i = strtod(start_time_s[2].c_str(),NULL); //index of array is 2 or 3
+        start_time_i = strtod(start_time_s[3].c_str(),NULL); //index of array is 2 or 3
         trace_info.name = find_next_pid.at(i).substr(9); //pid
         trace_info.pid = std::stoi(find_next_pid.at(i).substr(9)); //pid
 				trace_info.start_time = start_time_i;
@@ -298,7 +298,7 @@ void Tracer::create_process_info(
       // end time
       if(buf.find(find_prev_pid.at(i)) != -1){
         finish_time_s = split(trim(buf),delim);
-        finish_time_i = strtod(finish_time_s[2].c_str(),NULL); //index of array is 2 or 3
+        finish_time_i = strtod(finish_time_s[3].c_str(),NULL); //index of array is 2 or 3
         trace_info.runtime = finish_time_i - start_time_i;
         v_trace_info.push_back(trace_info);
       }

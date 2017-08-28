@@ -385,12 +385,13 @@ void MainWindow::viz_process(std::vector<trace_info_t> info, double zoom){
 					  y = base_y + ( j * space);
 				}
 
+#ifdef ANALYZE_DEADLINE_MISS
 				/* analyze deadline miss */
 				finish_time = info[i].start_time + info[i].runtime;
 				finish_time_prev =  info[i-1].start_time + info[i-1].runtime;
 
 				if(i!=0 && finish_time - finish_time_prev > info[i].deadline){
-					
+				
 					deadline_miss = new QGraphicsLineItem();
 					deadline_miss->setLine(
 							x*ZOOM+base_x+info[i].runtime,
@@ -404,6 +405,7 @@ void MainWindow::viz_process(std::vector<trace_info_t> info, double zoom){
 					k++;
 				}
 				break;
+#endif
 
 			default:
 				y = base_y;

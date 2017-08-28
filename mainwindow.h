@@ -14,6 +14,8 @@
 #include <QtGui>
 #include <QGraphicsView>
 
+#define ANALYZE_DEADLINE_MISS
+
 class QMenu;
 class SecondDialog;
 
